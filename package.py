@@ -60,7 +60,7 @@ def prepare_msg():
         email = request.form.get('email'),
         subject = request.form.get('subject'),
         message = request.form.get('message'),
-        recipient='patakiandras@pataki.tech').manager_sender()
+        recipient='your_mail_user_here').manager_sender()
 
 
 
