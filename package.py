@@ -6,14 +6,13 @@ from flask_wtf import FlaskForm
 from wtforms.fields.html5 import EmailField
 
 
-
 class ContactForm(Form):
     name = StringField('name')
     email = EmailField('email')
     subject = StringField('subject')
     message = TextAreaField('message')
     submit = SubmitField("send")
-
+    
 class Validator():
     form = ContactForm()
 
@@ -25,49 +24,27 @@ class Validator():
 
     def Test(self):
         if self.message and self.name and self.email and self.subject:
-            return True
+            msg = Message(self.subject,
+            sender=self.email,
+            recipients=['YOUR_MAIL_USERNAME'])
+            msg.body = """
+                De: %s; Assunto: %s
+                Mensagem:
+                %s
+                """ % (self.name, self.subject, self.message)
+            return msg 
         else:
             return False
 
-class Manager():
-
-    def __init__(self,name,email,subject,message,recipient):
-        self.name = name
-        self.email = email
-        self.subject = subject
-        self.message = message
-        self.recipient = recipient
-
-    def manager_sender(self):
-        msg = Message(self.subject,
-            sender=self.email,
-            recipients=['%s'%self.recipient])
-        msg.body = """
-        De: %s; Assunto: %s
-        Mensagem:
-        %s
-        """ % (self.name, self.subject, self.message)
-        return msg
-
-def form_validated():
+def form_data():
     return Validator(request.form.get('name'),
         request.form.get('email'),
         request.form.get('subject'),
         request.form.get('message')).Test()
-
-def prepare_msg():
-    return Manager(request.form.get('name'),
-        email = request.form.get('email'),
-        subject = request.form.get('subject'),
-        message = request.form.get('message'),
-        recipient='your_mail_user_here').manager_sender()
-
-
-
+    
 def package():
     html = Template(
     """
-
     
     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -107,11 +84,8 @@ def package():
     </div>
     </div>
    
-
     """
     )
     form = ContactForm()
     contact = html.render(form=form) 
     return contact
-
-
